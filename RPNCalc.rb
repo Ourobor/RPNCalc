@@ -1,5 +1,4 @@
 #!/usr/bin/env ruby
-#Undo by implementing another stack that holds all commands run
 require 'curses'
 class Stack
 	@head = nil
@@ -10,7 +9,8 @@ class Stack
 		newHead.next = @head
 		@head = newHead
 	end
-	def queuepush(value)
+	def queuepush(value)#Should really rewrite this >.>
+		#push element onto the bottom of the stack
 		if @head == nil
 			push(value)
 		else
@@ -25,7 +25,8 @@ class Stack
 			current.next = newHead
 		end
 	end
-	def queuepop
+	def queuepop #should really rewrite this >.>
+		#pop element from the bottom of the stack
 		if @head == nil
                         
                 else
@@ -40,6 +41,10 @@ class Stack
                         previous.next = nil
                 end	
 	end
+	#queuepush and queuepop both start to act horribly as the stack gets bigger and bigger
+	#and since queuepush is used every time anything is entered, the program will get slower
+	#and slower as the undo stack gets larger and larger
+
 	def pop
 		curr = @head
 		if curr.nil?
@@ -49,15 +54,7 @@ class Stack
 			return curr.value
 		end
 	end
-	def to_s
-		current = @head
-		returnStr = ""
-		while current != nil
-			returnStr += current.value.to_s + "\n"
-			current = current.next
-		end
-		return returnStr
-	end
+
 	def clear
 		@head = nil
 	end
@@ -73,13 +70,6 @@ class StackItter
 	end
 	def next
 		@current = @current.next
-	end
-	def nextdone?
-		if @current == nil
-			
-		else
-			return @current.next == nil
-		end
 	end
 	def value
 		return @current.value
@@ -142,8 +132,9 @@ class Game
 		lines = Curses.lines
 		#get width and height of terminal
 		
-			#pick a line for the stack to start at
-		stackStart = (lines * (3.0/4.0)).to_i
+		stackStart = (lines * (3.0/4.0)).to_i #pick a line for the stack to start at
+		
+		#draw area for stack
 		Curses.setpos(stackStart,0)
 		for col in 0..cols-1
 			Curses.addch("-")
@@ -151,8 +142,8 @@ class Game
 		for row in 0..stackStart-1
 			write(row,cols/2,"|")
 		end
-		#draw area for stack
 		
+		#draw stacks on screen
 		itter = @s.itter
 		line = stackStart - 1
 		while itter.done? == false
@@ -164,6 +155,10 @@ class Game
 		itter = @u.itter
 		while itter.done? == false
 			if(line == 0)
+				#it seems perfectly likely that the undo stack
+				#will overflow the screen in normal operation
+				#so if it does, we just write "..." on the 0th
+				#line and call it a day
 				write(line,(cols/2+1),"...")
 				break
 			end
@@ -171,18 +166,28 @@ class Game
 			line -= 1
 			itter.next
 		end
-		#write stack
 		
 		Curses.setpos(lines,0)
 	end
 	def is_a_number?(s)
 		s.to_s.match(/\A[+-]?\d+?(\.\d+)?\Z/) == nil ? false : true
 	end
+
 	def rule(&block)
+	#this function is designed to simplify doing any math operation
+	#by getting the needed number of things off of the stack and 
+	#pushing the result back on the stack
+	#ex rule {|a,b| b + a }
+	#would result in two numbers being popped off of the stack and passed
+	#into the block. The result of the block is returned, captured and
+	# pushed onto the stack
 		stuff = []
 		for x in 0..(block.arity-1)
 			new = @s.pop
 			if(new.nil?)
+				#if we run out of stuff on the stack to pop off
+				#and the rule still needs more, we should push
+				#everything back on the stack and bail out
 				stuff.each do |a|
 					@s.push(a)
 				end
@@ -190,6 +195,10 @@ class Game
 			end
 			stuff.push(new)
 		end
+		#I'm not entirely sure as to why this works the way it does,
+		#but apparently if you pass an array to a yield, it passes
+		#each element individually? I guess? However if you pass
+		#an array with only one element it passes an array? IDK
 		if(stuff.length == 1)
 			ret = yield(stuff[0])
 		else
@@ -200,6 +209,7 @@ class Game
 			@s.push(ret.round(@r))
 		end
 	end
+
 	def parse(string)
 		sections = string.split(" ")
 		i = 0
@@ -208,19 +218,19 @@ class Game
 		for part in sections
 			i += 1
 			case part
-			when "+"
+			when "+"#Add two things
 				rule {|a,b| b + a}
-			when "-"
+			when "-"#Subtract two things
 				rule {|a,b| b - a}
-			when "*"
+			when "*"#multiply two things
 				rule {|a,b| b * a}
-			when "/"
+			when "/"#divide two things
 				rule {|a,b| b / a}
-			when "q"
+			when "q"#quit the program
 				exit
-			when "^"
+			when "^"#exponentiate (raise b to the a power)
 				rule {|a,b| b ** a}
-			when "s"
+			when "s"#swap the two top elements on the stack
 				a = @s.pop
 				if a.nil?
 					raise "Stack Empty"
@@ -232,48 +242,47 @@ class Game
 				end
 				@s.push(a)
 				@s.push(b)	
-			when "d"
+			when "d"#duplicate the top element
 				a = @s.pop
 				if a.nil?
 					raise "Stack Empty"
 				end
 				2.times do  @s.push(a) end
-			when "c"
+			when "c"#delete the top element
 				@s.pop
-			when "cc"
+			when "cc"#clear the stack
 				@s.clear
-			when "sqrt"
+			when "sqrt"#take the square root of the top element
 				rule {|a| Math.sqrt(a) }
-			when "sin"
+			when "sin"#take the sine of the top element(assuming radians)
 				rule {|a| Math.sin(a) }
-			when "sind"
+			when "sind"#sin in degrees
 				rule {|a| Math.sin((a/180)*Math::PI) }
-			when "cos"
+			when "cos"#cos in radians
 				rule {|a| Math.cos(a) }
-			when "cosd"
+			when "cosd"#cos in degrees
 				rule {|a| Math.cos((a/180)*Math::PI) }
-			when "tan"
+			when "tan"#tan in radians
 				rule {|a| Math.tan(a) }
-			when "tand"
+			when "tand"#tan in degrees
 				rule {|a| Math.tan((a/180)*Math::PI) }
-			when "atan"
+			when "atan"#the arctangent in radians
 				rule {|a| Math.atan(a) }
-			when "atand"
+			when "atand"#the arctangent in degrees
 				rule {|a| (Math.atan(a) * 180) / Math::PI }
-			when "asin"
+			when "asin"#arcsine in radians
 				rule {|a| Math.asin(a) }
-			when "asind"
+			when "asind"#arcsine in degrees
 				rule {|a| (Math.asin(a) * 180) / Math::PI }
-				
-			when "acos"
+			when "acos"#arccosine in radians
 				rule {|a| Math.acos(a) }
-			when "r"
+			when "r"#set precision
 				@r = @s.pop
-			when "ckck"
+			when "ckck"#clear everything, including undo stack
 				nopush = true
 				@s.clear
 				@u.clear
-			when "u"
+			when "u"#undo last operation
 				nopush = true
 				@u.queuepop
 				@s.clear
@@ -283,21 +292,23 @@ class Game
 					parse(itter.value)
 					itter.next
 				end
-			else#numeral
-				#push op
+			else#push something onto the stack
 				if is_a_number?(part)
 					@s.push(part.to_f.round(@r))
 				else
 					raise "Not a number~"
 				end
 			end
-			if(nopush)
+			if(nopush)#some operations shouldn't push to the undo
+				#stack, this flag prevents them from being pushed
 				nopush = false	
 			else
 				@u.queuepush(part)
 			end
 		end
-		rescue RuntimeError => e
+		rescue RuntimeError => e#this bit handles an exceptions that parse
+		#raised and points an arrow at the term in the given string that
+		#caused the issue
 			@u.pop
 			x = 0
 			for y in 0...i
