@@ -3,7 +3,6 @@
 require 'curses'
 class Stack
 	@head = nil
-	@last = @head
 	def initialize
 	end
 	def push(value)
@@ -12,8 +11,6 @@ class Stack
 		@head = newHead
 	end
 	def queuepush(value)
-		#grab an itterator, find the last element
-		#tack an element onto the last element
 		if @head == nil
 			push(value)
 		else
@@ -68,6 +65,7 @@ class Stack
 		return StackItter.new(@head)
 	end
 end
+
 class StackItter
 	@current = nil
 	def initialize(head)
@@ -97,6 +95,7 @@ class StackItter
 		end
 	end
 end
+
 class Element
 	@next = nil
 	@value = nil
@@ -113,16 +112,15 @@ class Element
 		return @value
 	end
 end
+
 class Game
 	@s = nil
 	@u = nil
-	@ur = nil
 	@r = 6
 	def initialize()
 		@s = Stack.new 
 		@r = 6
 		@u = Stack.new
-		@ur = Stack.new
 	end
 	def init_screen
 		Curses.noecho # do not show typed keys
