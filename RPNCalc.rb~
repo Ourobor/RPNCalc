@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 require 'curses'
 require './stack'
-require './parse'
+
 class Game
 	@s = nil
 	@u = nil
