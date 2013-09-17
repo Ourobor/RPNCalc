@@ -2,6 +2,7 @@
 require 'curses'
 require './stack'
 require './parse'
+require './commands'
 class Game
 	@o = nil
 	def initialize()
@@ -73,7 +74,8 @@ class Game
 		Curses.setpos(lines,0)
 	end
 	def parse(string)
-		StringParse.parse(string)
+		#StringParse.parse(string)
+		Commands::CB.parse(string)
 	end
 	def main()
 		init_screen do
@@ -93,6 +95,5 @@ class Game
 		end
 	end
 end
-
 g = Game.new()
 g.main
