@@ -1,0 +1,35 @@
+Usage:
+	When the program is executed, 4 sections of the screen are shown
+	The top three show the stack, undo stack, and variables(not implemented yet)
+	The bottom section is the command interface
+	You may enter in a valid string of RPN and the calculator will execute it
+	All commands run will be pushed onto the undo stack
+	The results of all commands will be pushed onto the main stack
+Commands:
+Basic Arithmetic
+	"+": Addition
+	"-": Subtraction
+	"*": Multiplication
+	"/": Division
+	"^": Exponentiate(b^a)
+Trig:
+	All Trig commands have two forms; <command> and <command>d
+	The former assumes radians, the latter degrees
+	Only the radian forms will be listed, if you need it in degrees, or have degrees
+	or whatever, put a "d" on the end
+	"sin" : Sine(a)
+	"cos" : Cosine(a)
+	"tan" : Tangent(a)
+	"atan": ArcTangent(a)
+	"asin": ArcSine(a)
+	"acos": ArcCosine(a)
+Stack Operations:
+	"c"   : Delete the top element of the stack
+	"s"   : Swap the top two elements of the stack
+	"d"   : Duplicate the top element of the stack
+	"cc"  : Clear the main stack
+	"ckck": Clear ALL stacks, including the undo stack
+Misc:
+	"r" : pop the top element and set the precision to that
+	"u" : Undo the last operation
+	"q" : Exit
