@@ -2,11 +2,15 @@ class StringParse
 	@@r = 6
 	@@s = nil
 	@@u = nil
+	@@o = nil
 	def self.setS(s)
 		@@s = s
 	end
 	def self.setU(u)
 		@@u = u
+	end
+	def self.setO(o)
+		@@o = o
 	end
 	def self.is_a_number?(s)
 		s.to_s.match(/\A[+-]?\d+?(\.\d+)?\Z/) == nil ? false : true

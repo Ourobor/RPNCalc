@@ -5,11 +5,15 @@ require './parse'
 class Game
 	@s = nil
 	@u = nil
+	@o = nil
 	def initialize()
 		@s = Stack.new 
 		@u = Stack.new
+		@o = Hash.new
+		@o["hello"] = "123"
 		StringParse.setS(@s)
 		StringParse.setU(@u)
+		StringParse.setO(@o)
 	end
 	def init_screen
 		Curses.noecho # do not show typed keys
@@ -39,7 +43,8 @@ class Game
 			Curses.addch("-")
 		end
 		for row in 0..stackStart-1
-			write(row,cols/2,"|")
+			write(row,cols/3,"|")
+			write(row,cols/3*2,"|")
 		end
 		
 		#draw stacks on screen
@@ -58,12 +63,16 @@ class Game
 				#will overflow the screen in normal operation
 				#so if it does, we just write "..." on the 0th
 				#line and call it a day
-				write(line,(cols/2+1),"...")
+				write(line,(cols/3+1),"...")
 				break
 			end
-			write(line,(cols/2+1),itter.value.to_s)
+			write(line,(cols/3+1),itter.value.to_s)
 			line -= 1
 			itter.next
+		end
+		@o.each do |key,value|
+			line = stackStart -1
+			write(line,cols/3*2+1,key + " => " + value.to_s)
 		end
 		
 		Curses.setpos(lines,0)

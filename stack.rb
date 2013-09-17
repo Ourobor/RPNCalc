@@ -1,4 +1,6 @@
 class Stack
+	@@s = Stack.new
+	@@u = Stack.new
         @head = nil
         def initialize
         end
@@ -99,4 +101,3 @@ class Element
                 return @value
         end
 end
-
