@@ -3,16 +3,10 @@ require 'curses'
 require './stack'
 require './parse'
 class Game
-	@s = nil
-	@u = nil
 	@o = nil
 	def initialize()
-		@s = Stack.new 
-		@u = Stack.new
 		@o = Hash.new
 		@o["hello"] = "123"
-		StringParse.setS(@s)
-		StringParse.setU(@u)
 		StringParse.setO(@o)
 	end
 	def init_screen
@@ -31,11 +25,12 @@ class Game
 		Curses.setpos(line, column)
 	end
 	def drawScreen()
+		#get width and height of terminal
 		cols = Curses.cols
 		lines = Curses.lines
-		#get width and height of terminal
 		
-		stackStart = (lines * (3.0/4.0)).to_i #pick a line for the stack to start at
+		#pick a line for the stack to start at
+		stackStart = (lines * (3.0/4.0)).to_i 
 		
 		#draw area for stack
 		Curses.setpos(stackStart,0)
@@ -48,7 +43,7 @@ class Game
 		end
 		
 		#draw stacks on screen
-		itter = @s.itter
+		itter = Stack.S.itter
 		line = stackStart - 1
 		while itter.done? == false
 			write(line,0,itter.value.to_s)
@@ -56,7 +51,7 @@ class Game
 			itter.next
 		end
 		line = stackStart - 1
-		itter = @u.itter
+		itter = Stack.U.itter
 		while itter.done? == false
 			if(line == 0)
 				#it seems perfectly likely that the undo stack

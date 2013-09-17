@@ -1,7 +1,13 @@
 class Stack
-	@@s = Stack.new
-	@@u = Stack.new
-        @head = nil
+	@@S = Stack.new
+	@@U = Stack.new
+        def self.S()
+		return @@S
+	end
+	def self.U()
+		return @@U
+	end
+	@head = nil
         def initialize
         end
         def push(value)

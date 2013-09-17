@@ -1,14 +1,6 @@
 class StringParse
 	@@r = 6
-	@@s = nil
-	@@u = nil
 	@@o = nil
-	def self.setS(s)
-		@@s = s
-	end
-	def self.setU(u)
-		@@u = u
-	end
 	def self.setO(o)
 		@@o = o
 	end
@@ -26,13 +18,13 @@ class StringParse
 	# pushed onto the stack
 		stuff = []
 		for x in 0..(block.arity-1)
-			new = @@s.pop
+			new = Stack.S.pop
 			if(new.nil?)
 				#if we run out of stuff on the stack to pop off
 				#and the rule still needs more, we should push
 				#everything back on the stack and bail out
 				stuff.each do |a|
-					@@s.push(a)
+					Stack.S.push(a)
 				end
 				raise "Stack Empty"
 			end
@@ -49,7 +41,7 @@ class StringParse
 		end
 		p ret
 		if !(ret.nil?)
-			@@s.push(ret.round(@@r))
+			Stack.S.push(ret.round(@@r))
 		end
 	end
 
@@ -75,27 +67,27 @@ class StringParse
 			when "^"#exponentiate (raise b to the a power)
 				rule {|a,b| b ** a}
 			when "s"#swap the two top elements on the stack
-				a = @@s.pop
+				a = Stack.S.pop
 				if a.nil?
 					raise "Stack Empty"
 				end
-                                b = @@s.pop
+                                b = Stack.S.pop
 				if b.nil?
-					@@s.push(a)
+					Stack.S.push(a)
 					raise "Stack Empty"
 				end
-				@@s.push(a)
-				@@s.push(b)	
+				Stack.S.push(a)
+				Stack.S.push(b)	
 			when "d"#duplicate the top element
-				a = @@s.pop
+				a = Stack.S.pop
 				if a.nil?
 					raise "Stack Empty"
 				end
-				2.times do  @@s.push(a) end
+				2.times do  Stack.S.push(a) end
 			when "c"#delete the top element
-				@@s.pop
+				Stack.S.pop
 			when "cc"#clear the stack
-				@@s.clear
+				Stack.S.clear
 			when "sqrt"#take the square root of the top element
 				rule {|a| Math.sqrt(a) }
 			when "sin"#take the sine of the top element(assuming radians)
@@ -121,24 +113,24 @@ class StringParse
 			when "acos"#arccosine in radians
 				rule {|a| Math.acos(a) }
 			when "r"#set precision
-				@@r = @@s.pop
+				@@r = Stack.S.pop
 			when "ckck"#clear everything, including undo stack
 				nopush = true
-				@@s.clear
-				@@u.clear
+				Stack.S.clear
+				Stack.U.clear
 			when "u"#undo last operation
 				nopush = true
-				@@u.queuepop
-				@@s.clear
-				itter = @@u.itter
-				@@u.clear
+				Stack.U.queuepop
+				Stack.S.clear
+				itter = Stack.U.itter
+				Stack.U.clear
 				while !(itter.done?)
 					parse(itter.value)
 					itter.next
 				end
 			else#push something onto the stack
 				if is_a_number?(part)
-					@@s.push(part.to_f.round(@@r))
+					Stack.S.push(part.to_f.round(@@r))
 				else
 					raise "Not a number~"
 				end
@@ -147,13 +139,13 @@ class StringParse
 				#stack, this flag prevents them from being pushed
 				nopush = false	
 			else
-				@@u.queuepush(part)
+				Stack.U.queuepush(part)
 			end
 		end
 		rescue RuntimeError => e#this bit handles an exceptions that parse
 		#raised and points an arrow at the term in the given string that
 		#caused the issue
-			@@u.pop
+			Stack.U.pop
 			x = 0
 			for y in 0...i
 				x += sections[y].length + 1
