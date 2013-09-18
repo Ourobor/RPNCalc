@@ -10,6 +10,9 @@ class Stack
 	@head = nil
         def initialize
         end
+	def top
+		return @head.value
+	end
         def push(value)
                 newHead = Element.new(value)
                 newHead.next = @head

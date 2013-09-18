@@ -66,9 +66,10 @@ class Game
 			line -= 1
 			itter.next
 		end
-		@o.each do |key,value|
-			line = stackStart -1
+		line = stackStart -1
+		Commands::CB.objtable.each do |key,value|
 			write(line,cols/3*2+1,key + " => " + value.to_s)
+			line -= 1
 		end
 		
 		Curses.setpos(lines,0)
