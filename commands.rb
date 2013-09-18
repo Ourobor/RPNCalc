@@ -36,6 +36,16 @@ class CommandBuilder
 		addRule("r", lambda {|a| @r = a[0].to_f; return []}, 1)
 		addRule("ckck", lambda {|a| Stack.S.clear; Stack.U.clear; return [] }, 0)
 		addRule("u", lambda {|a| Stack.U.pop; Stack.U.pop.undo; return []}, 0)
+		#If a single person reads this code and wants to add more rules to it or
+		#something, it's fairly straightforward
+		#addRule adds a rule to be parsed
+		#The first arg is the name of the command, which is what will be looked for
+		#by the code when you want to execute it
+		#The second arg is a lambda function(or proc(Maybe block? IDK)) that is given
+		#an array of arguments and expected to return an array of things that should
+		#be pushed to the stack
+		#The third argument is how many arguments are needed for the lambda to work
+		#these are poped off of the stack
 	end
 	def addRule(name,code,args)
 		@rules[name] = code
@@ -82,9 +92,11 @@ class CommandBuilder
 			end
 		end
 		rescue StopIteration
-		
+			#Uhhhhh, itterators are dumb, soooo yeah
+			#If you're really curious why I did this, enums don't have a function
+			#to check if they're done or not, they just throw a big, dumb exception
+			#/sigh		
 		end
-
 
 		rescue RuntimeError => e#this bit handles an exceptions that parse
 		#raised and points an arrow at the term in the given string that
@@ -113,11 +125,12 @@ class CommandBuilder
 	end
 end
 class Command
-	@exec = nil
-	@args = nil
-	@name = nil
-
-	@numberOfConsequences = nil
+	@exec = nil #Lambda that determines what values to push to the stack
+	@args = nil #list of arguments that the lambda needs to function, popped
+			#from the stack
+	@name = nil #The name of the command, used for to_s stuff so the user can
+			#see what the command's name is on the command stack
+	@numberOfConsequences = nil #The number of things the command pushed
 
 	def initialize(lamb,args,name)
 		@exec = lamb
@@ -125,10 +138,11 @@ class Command
 		@name = name
 		@numberOfConsequences = 0
 	end
-	def isanum
+	def isanum #some commands are actually numbers, they have no arguments
+			#but have a single consequence(The number pushed to the stack)
 		@numberOfConsequences = 1
 	end
-	def do
+	def do#execute the command
 		topush = @exec.call(@args)
 		for item in topush
 			Stack.S.push(item)
@@ -136,16 +150,13 @@ class Command
 		end
 		p topush
 	end
-	def undo
-	#to undo a command, we're gonna need two things
-	#crap to push onto the stack => @args
-	#a number of things to pop from the stack => @numberOfConsequences
-			for x in 0...@numberOfConsequences
-				Stack.S.pop#Take the number of things off the stack that we put on
-			end
-			for y in @args.reverse#put the things we took off the stack back on
-				Stack.S.push(y)
-			end
+	def undo#undo the command
+		for x in 0...@numberOfConsequences
+			Stack.S.pop#Take the number of things off the stack that we put on
+		end
+		for y in @args.reverse#put the things we took off the stack back on
+			Stack.S.push(y)
+		end
 	end
 	def to_s
 		args = ""
