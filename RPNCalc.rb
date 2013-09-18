@@ -1,14 +1,10 @@
 #!/usr/bin/env ruby
 require 'curses'
 require './stack'
-require './parse'
 require './commands'
 class Game
 	@o = nil
 	def initialize()
-		@o = Hash.new
-		@o["hello"] = "123"
-		StringParse.setO(@o)
 	end
 	def init_screen
 		Curses.noecho # do not show typed keys
