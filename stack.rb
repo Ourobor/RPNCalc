@@ -1,60 +1,31 @@
 class Stack
 	@@S = Stack.new
 	@@U = Stack.new
+
         def self.S()
 		return @@S
 	end
 	def self.U()
 		return @@U
 	end
+
+
 	@head = nil
+
         def initialize
         end
+
 	def top
 		return @head.value
 	end
+
         def push(value)
                 newHead = Element.new(value)
                 newHead.next = @head
                 @head = newHead
         end
-        def queuepush(value)#Should really rewrite this >.>
-                #push element onto the bottom of the stack
-                if @head == nil
-                        push(value)
-                else
-                        itt = itter
-                        current = nil
-                        while itt.done? == false
-                                current = itt.node
-                                itt.next
-                        end
-                        newHead = Element.new(value)
-                        newHead.next = nil
-                        current.next = newHead
-                end
-        end
-        def queuepop #should really rewrite this >.>
-                #pop element from the bottom of the stack
-                if @head == nil
 
-                else
-                        itt = itter
-                        current = nil
-                        previous = nil
-                        while itt.done? == false
-                                previous = current
-                                current = itt.node
-                                itt.next
-                        end
-                        previous.next = nil
-                end
-        end
-        #queuepush and queuepop both start to act horribly as the stack gets bigger and bigger
-        #and since queuepush is used every time anything is entered, the program will get slower
-        #and slower as the undo stack gets larger and larger
-
-        def pop
+       	def pop
                 curr = @head
                 if curr.nil?
                         return nil
@@ -63,10 +34,12 @@ class Stack
                         return curr.value
                 end
         end
- def clear
+	
+	def clear
                 @head = nil
         end
-        def itter
+        
+	def itter
                 return StackItter.new(@head)
         end
 end
