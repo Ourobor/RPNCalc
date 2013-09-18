@@ -61,6 +61,12 @@ class CommandBuilder
 				cmd = buildCommand(part)
 				Stack.U.push(cmd)
 				cmd.do
+			elsif(is_a_number?(part))
+				#push
+				num = Command.new(lambda { }, [], part.to_f.round(@r))
+				num.isanum
+				Stack.U.push(num)
+				Stack.S.push(part.to_f.round(@r))
 			elsif(part == ">>")
 				var = sections[itter.next]
 				@objtable[var] = Stack.S.top
@@ -69,12 +75,7 @@ class CommandBuilder
 				num.isanum
 				Stack.U.push(num)
 				Stack.S.push(@objtable[part].to_f.round(@r))
-			elsif(is_a_number?(part))
-				#push
-				num = Command.new(lambda { }, [], part.to_f.round(@r))
-				num.isanum
-				Stack.U.push(num)
-				Stack.S.push(part.to_f.round(@r))
+
 			else
 				#bail
 				raise("Invalid command")
@@ -140,19 +141,20 @@ class Command
 	#crap to push onto the stack => @args
 	#a number of things to pop from the stack => @numberOfConsequences
 			for x in 0...@numberOfConsequences
-				Stack.S.pop
+				Stack.S.pop#Take the number of things off the stack that we put on
 			end
-			for y in @args.reverse
+			for y in @args.reverse#put the things we took off the stack back on
 				Stack.S.push(y)
 			end
 	end
 	def to_s
 		args = ""
-		if args.length > 0
+		if @args.length > 0
 		args << "["
 		for item in @args.reverse
-			args << item.to_s
+			args << item.to_s + ", "
 		end
+		args = args[0..-3]
 		args << "]"
 		end
 		return  args + ' ' + @name.to_s
