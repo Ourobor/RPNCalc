@@ -1,8 +1,8 @@
 Usage:
 	When the program is executed, 4 sections of the screen are shown
-	The top three show the stack, undo stack, and variables(not implemented yet)
+	The top three show the stack, undo stack, and variables
 	The bottom section is the command interface
-	You may enter in a valid string of RPN and the calculator will execute it
+	You may enter in a valid string of RPN and it will be executed
 	All commands run will be pushed onto the undo stack
 	The results of all commands will be pushed onto the main stack
 Commands:
@@ -15,8 +15,8 @@ Basic Arithmetic
 Trig:
 	All Trig commands have two forms; <command> and <command>d
 	The former assumes radians, the latter degrees
-	Only the radian forms will be listed, if you need it in degrees, or have degrees
-	or whatever, put a "d" on the end
+	Only the radian forms will be listed, if you need it in degrees, or 
+	have degrees or whatever, put a "d" on the end
 	"sin" : Sine(a)
 	"cos" : Cosine(a)
 	"tan" : Tangent(a)
@@ -33,3 +33,16 @@ Misc:
 	"r" : pop the top element and set the precision to that
 	"u" : Undo the last operation
 	"q" : Exit
+
+Variables:
+	Variables are just a way to store a value in a different way
+	If you store a value to a variable, that value is stored in 
+	that name. If you use the name of the variable in the interface
+	the value will be pushed to the stack. To store a value
+	use the ">>" command. The next thing in the command string
+	will be used as the name. ex:
+		12 2 + >> var1
+	would result in a variable named var1 with 14 stored in it
+	ex
+		var1 12 - 
+	would result in 2
