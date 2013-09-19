@@ -46,3 +46,11 @@ Variables:
 	ex
 		var1 12 - 
 	would result in 2
+Examples:
+	I will use these weird quotes(``) to denote text entered into the program. ">>" denotes what's on the stack
+	ex: `12` >> [12] is stating that "12" is entered into the program, and the stack has 12 in it
+	ex: `12 13` >> [13, 12] etc
+	
+	ex Take the sine of a 90° angle
+	`90 sind` >> []
+	
