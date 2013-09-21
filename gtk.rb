@@ -61,6 +61,14 @@ class RubyApp < Gtk::Window
 			commandBuffer.insert(textiter, itter.value.to_s + "\n")
 			itter.next
 		end
+
+		variableBuffer = @variableTable.buffer
+		variableBuffer.set_text ""
+		textiter = variableBuffer.start_iter
+
+		Commands::CB.objtable.each do |key,value|
+			variableBuffer.insert(textiter, key + " => " + value.to_s)
+		end
 		
 	end
 end
