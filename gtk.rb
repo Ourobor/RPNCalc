@@ -52,6 +52,15 @@ class RubyApp < Gtk::Window
 			mainBuffer.insert(textiter, itter.value.to_s + "\n")
 			itter.next
 		end
+		commandBuffer = @commandStack.buffer
+		commandBuffer.set_text ""
+		textiter = commandBuffer.start_iter
+		itter = Stack.U.itter
+		
+		while itter.done? == false
+			commandBuffer.insert(textiter, itter.value.to_s + "\n")
+			itter.next
+		end
 		
 	end
 end
