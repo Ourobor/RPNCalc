@@ -5,7 +5,11 @@ class RubyApp < Gtk::Window
 		super
 		
 		set_title "Hello World!"
-		
+	
+		signal_connect "destroy" do 
+			Gtk.main_quit 
+		end
+	
 		mainStack = Gtk::TextView.new
 		commandStack = Gtk::TextView.new
 		variableTable = Gtk::TextView.new
@@ -13,8 +17,8 @@ class RubyApp < Gtk::Window
 		uiBox = Gtk::Box.new :vertical, 0
 		entry = Gtk::Entry.new
 		errorstuff = Gtk::TextView.new
-		uiBox.add errorstuff, :expand => true, :fill => true, :padding => 1
 		uiBox.add entry, :expand => false, :fill => false, :padding => 1
+		uiBox.add errorstuff, :expand => true, :fill => true, :padding => 1
 		
 		mainTable = Gtk::Table.new 4,3,true
 		mainTable.set_row_spacings 1

@@ -82,6 +82,9 @@ class CommandBuilder
 				Stack.S.push(round(part))
 			elsif(part == ">>")
 				var = sections[itter.next]
+				if @rules.has_key?(var)
+					raise("Can't name a variable the same name as a rule!")
+				end
 				@objtable[var] = Stack.S.top
 			elsif(@objtable.has_key?(part))
 				num = Command.new(lambda { }, [], round(@objtable[part]))
