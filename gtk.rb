@@ -27,10 +27,8 @@ class RubyApp < Gtk::Window
 				@errorstuff.buffer.set_text ""
 				textiter = @errorstuff.buffer.start_iter
 				@errorstuff.buffer.insert textiter, e.message, "monospace" 
-				#write((Curses.lines  * (3.0/4.0)).to_i + 2, 0, e.message)
 			end
 			@entry.text = ""
-			
 			changeState
 		end
 		@errorstuff = Gtk::TextView.new

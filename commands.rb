@@ -155,7 +155,6 @@ class Command
 			Stack.S.push(CB.round(item))
 			@numberOfConsequences += 1
 		end
-		p topush
 	end
 	def undo#undo the command
 		for x in 0...@numberOfConsequences
