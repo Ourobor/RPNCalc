@@ -13,10 +13,12 @@ class RubyApp < Gtk::Window
 		end
 	
 		@mainStack = Gtk::TextView.new
-		mainBuffer = @mainStack.buffer
+		@mainStack.editable = false
 		@commandStack = Gtk::TextView.new
+		@commandStack.editable = false	
 		@variableTable = Gtk::TextView.new
-		
+		@variableTable.editable = false
+	
 		uiBox = Gtk::Box.new :vertical, 0
 		@entry = Gtk::Entry.new
 		@entry.signal_connect "activate" do |s,e|
@@ -32,6 +34,7 @@ class RubyApp < Gtk::Window
 			changeState
 		end
 		@errorstuff = Gtk::TextView.new
+		@errorstuff.editable = false
 		@errorstuff.buffer.create_tag("monospace", {"font" => "monospace"})
 		uiBox.add @entry, :expand => false, :fill => false, :padding => 1
 		uiBox.add @errorstuff, :expand => true, :fill => true, :padding => 1
@@ -45,8 +48,8 @@ class RubyApp < Gtk::Window
 		mainTable.attach(uiBox,0,3,3,4)
 		changeState	
 		add mainTable
-
 		show_all
+		@entry.grab_focus
 	end
 	def parse(string)
 		Commands::CB.parse(string)
