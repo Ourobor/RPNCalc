@@ -20,12 +20,21 @@ class RubyApp < Gtk::Window
 		uiBox = Gtk::Box.new :vertical, 0
 		@entry = Gtk::Entry.new
 		@entry.signal_connect "activate" do |s,e|
-			Commands::CB.parse(@entry.text)
+			begin
+        	               	parse(@entry.text)
+			rescue RuntimeError => e
+				puts "Uhoh"
+				@errorstuff.buffer.set_text ""
+				textiter = @errorstuff.buffer.start_iter
+				@errorstuff.buffer.insert textiter, e.message, "monospace" 
+				#write((Curses.lines  * (3.0/4.0)).to_i + 2, 0, e.message)
+			end
 			@entry.text = ""
 			
 			changeState
 		end
 		@errorstuff = Gtk::TextView.new
+		@errorstuff.buffer.create_tag("monospace", {"font" => "monospace"})
 		uiBox.add @entry, :expand => false, :fill => false, :padding => 1
 		uiBox.add @errorstuff, :expand => true, :fill => true, :padding => 1
 		
@@ -40,6 +49,9 @@ class RubyApp < Gtk::Window
 		add mainTable
 
 		show_all
+	end
+	def parse(string)
+		Commands::CB.parse(string)
 	end
 	def changeState
 		#regen buffers and such
