@@ -6,7 +6,7 @@ class RubyApp < Gtk::Window
 	def initialize
 		super
 		
-		set_title "Hello World!"
+		set_title "RPNCalc"
 	
 		signal_connect "destroy" do 
 			Gtk.main_quit 
