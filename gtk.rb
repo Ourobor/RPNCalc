@@ -6,7 +6,7 @@ class RubyApp < Gtk::Window
 	def initialize
 		super
 		
-		set_title "Hello World!"
+		set_title "RPNCalc"
 	
 		signal_connect "destroy" do 
 			Gtk.main_quit 
@@ -25,7 +25,6 @@ class RubyApp < Gtk::Window
 			begin
         	               	parse(@entry.text)
 			rescue RuntimeError => e
-				puts "Uhoh"
 				@errorstuff.buffer.set_text ""
 				textiter = @errorstuff.buffer.start_iter
 				@errorstuff.buffer.insert textiter, e.message, "monospace" 
