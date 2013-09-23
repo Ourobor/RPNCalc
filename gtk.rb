@@ -6,7 +6,7 @@ class RubyApp < Gtk::Window
 	def initialize
 		super
 		
-		set_title "RPNCalc"
+		set_title "Hello World!"
 	
 		signal_connect "destroy" do 
 			Gtk.main_quit 
@@ -14,10 +14,13 @@ class RubyApp < Gtk::Window
 	
 		@mainStack = Gtk::TextView.new
 		@mainStack.editable = false
+		@mainStack.sensitive = false
 		@commandStack = Gtk::TextView.new
 		@commandStack.editable = false	
+		@commandStack.sensitive = false
 		@variableTable = Gtk::TextView.new
 		@variableTable.editable = false
+		@variableTable.sensitive = false
 	
 		uiBox = Gtk::Box.new :vertical, 0
 		@entry = Gtk::Entry.new
@@ -34,6 +37,7 @@ class RubyApp < Gtk::Window
 		end
 		@errorstuff = Gtk::TextView.new
 		@errorstuff.editable = false
+		@errorstuff.sensitive = false
 		@errorstuff.buffer.create_tag("monospace", {"font" => "monospace"})
 		uiBox.add @entry, :expand => false, :fill => false, :padding => 1
 		uiBox.add @errorstuff, :expand => true, :fill => true, :padding => 1
@@ -81,6 +85,8 @@ class RubyApp < Gtk::Window
 		Commands::CB.objtable.each do |key,value|
 			variableBuffer.insert(textiter, key + " => " + value.to_s)
 		end
+		
+		@errorstuff.buffer.set_text ""
 		
 	end
 end
