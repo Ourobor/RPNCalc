@@ -1,0 +1,24 @@
+
+
+
+
+                                                          +------------------------+
+                                                          |UI                      |
+                                 Sends commands to        |------------------------|
+                            +-----------------------------+Prints stacks and passes|
+                            |                             |user input along to the |
+                            |                             |parser(commands)        |
+                            v                             +-----------+------------+
+                 +------------------------+                           |
+                 |Commands                |                           | Reads state from
+                 |------------------------|                           |
+                 |Deals with changing the |                           |
+                 |state of the stack based|                           |
+                 |on an imput             |                           |
+                 +----------+-------------+                           v
+                            |                              +--------------------+
+                            |                              |Stack               |
+                            |      Modifies                |--------------------|
+                            +----------------------------->|Maintains stacks for|
+                                                           |use                 |
+                                                           +--------------------+
