@@ -1,0 +1,25 @@
+
+         +---------------------------------------+
+         |CommandBuilder                         |
+         |---------------------------------------|
+         |Deals with creating command objects for|
+         |changing Stack state.                  |
+         +---------+-----------------------------+
+                   |
+                   |
+                   |
+                   |
+                   +----+
+                        |
+                        |
+                        |
+                        v
+               +-----------------------------+
+               |Command                      |
+               |-----------------------------|
+               |Represents a command that the|
+               |calculator should make       |
+               |Contains the code to change  |
+               |the state of the stack(do)   |
+               |and undo what it did(undo)   |
+               +-----------------------------+
