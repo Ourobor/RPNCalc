@@ -3,7 +3,9 @@ require 'curses'
 require './stack'
 require './commands'
 class Screen
+	@commandBuilder = nil
 	def initialize()
+		@commandBuilder = Commands::CommandBuilder.new
 	end
 	def init_screen
 		Curses.noecho # do not show typed keys
@@ -62,7 +64,7 @@ class Screen
 			itter.next
 		end
 		line = stackStart -1
-		Commands::CB.objtable.each do |key,value|
+		@commandBuilder.objtable.each do |key,value|
 			write(line,cols/3*2+1,key + " => " + value.to_s)
 			line -= 1
 		end
@@ -70,7 +72,7 @@ class Screen
 		Curses.setpos(lines,0)
 	end
 	def parse(string)
-		Commands::CB.parse(string)
+		@commandBuilder.parse(string)
 	end
 	def main()
 		init_screen do

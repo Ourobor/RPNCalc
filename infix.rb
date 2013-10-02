@@ -1,4 +1,4 @@
-module Shunt
+module Infix
 
 class RailYard
 	def initialize
@@ -39,11 +39,5 @@ class RailYard
 		@OQ = Array.new
 	end
 end
-rails = RailYard.new
-rails.addRule("+", 1, true)
-rails.addRule("-", 1, true)
-rails.addRule("*", 2, true)
-rails.addRule("/", 2, true)
-rails.parse(gets)
-rails.print
+STATION = RailYard.new
 end

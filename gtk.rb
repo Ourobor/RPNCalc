@@ -11,7 +11,7 @@ class RubyApp < Gtk::Window
 		signal_connect "destroy" do 
 			Gtk.main_quit 
 		end
-	
+		@commandBuilder = Commands::CommandBuilder.new	
 		@mainStack = Gtk::TextView.new
 		@mainStack.editable = false
 		@mainStack.sensitive = false
@@ -55,7 +55,7 @@ class RubyApp < Gtk::Window
 		@entry.grab_focus
 	end
 	def parse(string)
-		Commands::CB.parse(string)
+		@commandBuilder.parse(string)
 	end
 	def changeState
 		#regen buffers and such
@@ -82,7 +82,7 @@ class RubyApp < Gtk::Window
 		variableBuffer.set_text ""
 		textiter = variableBuffer.start_iter
 
-		Commands::CB.objtable.each do |key,value|
+		@commandBuilder.objtable.each do |key,value|
 			variableBuffer.insert(textiter, key + " => " + value.to_s)
 		end
 		

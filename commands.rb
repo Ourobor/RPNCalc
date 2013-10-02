@@ -1,7 +1,7 @@
 module Commands
 require './stack'
 class CommandBuilder
-	@r = 6
+	@@r = 6
 	@rules = nil
 	@args = nil
 	@objtable = nil
@@ -9,7 +9,7 @@ class CommandBuilder
 		@rules = Hash.new
 		@args = Hash.new
 		@objtable = Hash.new
-		@r = 6
+		@@r = 6
 		addRule("+", lambda {|a| return [a[1].to_f + a[0].to_f] }, 2)
 		addRule("q", Proc.new { exit }, 0)
 		addRule("-", lambda {|a| return [a[1].to_f - a[0].to_f] }, 2)
@@ -33,7 +33,7 @@ class CommandBuilder
 		addRule("asind", lambda {|a| return [(Math.asin(a[0].to_f) * 180) / Math::PI]}, 1)
 		addRule("acos", lambda {|a| return [Math.acos(a[0].to_f)]}, 1)
 		addRule("acosd", lambda {|a| return [(Math.acos(a[0].to_f) * 180) / Math::PI]}, 1)
-		addRule("r", lambda {|a| @r = a[0].to_f; return []}, 1)
+		addRule("r", lambda {|a| @@r = a[0].to_f; return []}, 1)
 		addRule("ckck", lambda {|a| Stack.S.clear; Stack.U.clear; return [] }, 0)
 		addRule("u", lambda {|a| Stack.U.pop; Stack.U.pop.undo; return []}, 0)
 		#If a single person reads this code and wants to add more rules to it or
@@ -54,8 +54,8 @@ class CommandBuilder
 	def is_a_number?(s)
 		s.to_s.match(/\A[+-]?\d+?(\.\d+)?\Z/) == nil ? false : true
 	end
-	def round(num)
-		return num.to_f.round(@r)
+	def self.round(num)
+		return num.to_f.round(@@r)
 	end
 	def parse(string)
 		sections = string.split(" ")
@@ -76,10 +76,10 @@ class CommandBuilder
 				cmd.do
 			elsif(is_a_number?(part))
 				#push
-				num = Command.new(lambda { }, [], round(part))
+				num = Command.new(lambda { }, [], CommandBuilder.round(part))
 				num.isanum
 				Stack.U.push(num)
-				Stack.S.push(round(part))
+				Stack.S.push(CommandBuilder.round(part))
 			elsif(part == ">>")
 				var = sections[itter.next]
 				if @rules.has_key?(var)
@@ -87,10 +87,10 @@ class CommandBuilder
 				end
 				@objtable[var] = Stack.S.top
 			elsif(@objtable.has_key?(part))
-				num = Command.new(lambda { }, [], round(@objtable[part]))
+				num = Command.new(lambda { }, [], CommandBuilder.round(@objtable[part]))
 				num.isanum
 				Stack.U.push(num)
-				Stack.S.push(round(@objtable[part]))
+				Stack.S.push(CommandBuilder.round(@objtable[part]))
 
 			else
 				#bail
@@ -130,7 +130,7 @@ class CommandBuilder
 		return command
 	end
 end
-CB = CommandBuilder.new
+#CB = CommandBuilder.new
 class Command
 	@exec = nil #Lambda that determines what values to push to the stack
 	@args = nil #list of arguments that the lambda needs to function, popped
@@ -152,7 +152,7 @@ class Command
 	def do#execute the command
 		topush = @exec.call(@args)
 		for item in topush
-			Stack.S.push(CB.round(item))
+			Stack.S.push(CommandBuilder.round(item))
 			@numberOfConsequences += 1
 		end
 	end
@@ -161,7 +161,7 @@ class Command
 			Stack.S.pop#Take the number of things off the stack that we put on
 		end
 		for y in @args.reverse#put the things we took off the stack back on
-			Stack.S.push(CB.round(y))
+			Stack.S.push(CommandBuilder.round(y))
 		end
 	end
 	def to_s
