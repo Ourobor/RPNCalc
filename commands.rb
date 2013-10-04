@@ -98,10 +98,7 @@ class CommandBuilder
 			end
 		end
 		rescue StopIteration
-			#Uhhhhh, itterators are dumb, soooo yeah
-			#If you're really curious why I did this, enums don't have a function
-			#to check if they're done or not, they just throw a big, dumb exception
-			#/sigh		
+			#iterators only throw an exception when they're done
 		end
 
 		rescue RuntimeError => e#this bit handles an exceptions that parse

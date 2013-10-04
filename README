@@ -1,10 +1,11 @@
 Usage:
-	When the program is executed, 4 sections of the screen are shown
-	The top three show the stack, undo stack, and variables
-	The bottom section is the command interface
-	You may enter in a valid string of RPN and it will be executed
-	All commands run will be pushed onto the undo stack
-	The results of all commands will be pushed onto the main stack
+	There are two choices of GUI available for use. curses.rb will open the application in the command line using curses. gtk.rb will open the application as a gtk window. Both GUIs share a common interface. There will be three large boxes at the top of the screen. They show the Main Stack, the Command Stack, and the Object Table respectively.
+	The Main stack shows the actual stack of the calculator. All numbers are pushed here when entered and the results of the operations are pushed here as well.
+	The Command Stack shows all commands the calculator has run. All push operations are recorded here from both number entry and mathematical operation. This is used for the undo function.
+	The Object Table shows all variables and their values stored in the calculator
+
+The last section is the input line which is broken up into the input box and the error box below it. The input box is where you enter in commands. The commands can be singular("2") or complicated("2 2 + 4 -"). The parser will break up commands based on spaces so things like "2 2 3 ++" will not work because it will not understand what "++" means. If an error occurs at any time in parsing, the parser stops and will display an error that shows what it had a problem parsing. Anything after the error will /NOT/ be parsed and must be entered again.
+
 Commands:
 Basic Arithmetic
 	"+": Addition
@@ -16,7 +17,7 @@ Trig:
 	All Trig commands have two forms; <command> and <command>d
 	The former assumes radians, the latter degrees
 	Only the radian forms will be listed, if you need it in degrees, or 
-	have degrees or whatever, put a "d" on the end
+	have degrees, put a "d" on the end
 	"sin" : Sine(a)
 	"cos" : Cosine(a)
 	"tan" : Tangent(a)
@@ -47,10 +48,14 @@ Variables:
 		var1 12 - 
 	would result in 2
 Examples:
-	I will use these weird quotes(``) to denote text entered into the program. ">>" denotes what's on the stack
+	I will use these (``) quotes to denote text entered into the program. ">>" denotes what's on the stack
 	ex: `12` >> [12] is stating that "12" is entered into the program, and the stack has 12 in it
 	ex: `12 13` >> [13, 12] etc
 	
 	ex Take the sine of a 90° angle
 	`90 sind` >> []
-	
+
+	ex Store a variable on the stack
+	`12 >> var` >> [12]
+	`var` >> [12, 12]
+	`+` >> [24]	
