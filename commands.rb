@@ -36,6 +36,7 @@ class CommandBuilder
 		addRule("r", lambda {|a| @@r = a[0].to_f; return []}, 1)
 		addRule("ckck", lambda {|a| Stack.S.clear; Stack.U.clear; return [] }, 0)
 		addRule("u", lambda {|a| Stack.U.pop; Stack.U.pop.undo; return []}, 0)
+		addRule("clrt", lambda {|a| Stack.U.pop; @objtable = Hash.new}, 0)
 		#If a single person reads this code and wants to add more rules to it or
 		#something, it's fairly straightforward
 		#addRule adds a rule to be parsed
