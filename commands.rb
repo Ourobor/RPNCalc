@@ -10,6 +10,7 @@ class CommandBuilder
 		@args = Hash.new
 		@objtable = Hash.new
 		@@r = 6
+		@state = StateMachine.new
 		addRule("+", lambda {|a| return [a[1].to_f + a[0].to_f] }, 2)
 		addRule("q", Proc.new { exit }, 0)
 		addRule("-", lambda {|a| return [a[1].to_f - a[0].to_f] }, 2)
@@ -64,9 +65,6 @@ class CommandBuilder
 		nopush = false
 		begin
 		itter = (0...sections.length).to_enum
-
-
-		begin
 		while true
  			i = itter.next
 			part = sections[i]	
@@ -100,8 +98,6 @@ class CommandBuilder
 		end
 		rescue StopIteration
 			#iterators only throw an exception when they're done
-		end
-
 		rescue RuntimeError => e#this bit handles an exceptions that parse
 		#raised and points an arrow at the term in the given string that
 		#caused the issue
@@ -128,7 +124,7 @@ class CommandBuilder
 		return command
 	end
 end
-#CB = CommandBuilder.new
+
 class Command
 	@exec = nil #Lambda that determines what values to push to the stack
 	@args = nil #list of arguments that the lambda needs to function, popped
@@ -141,7 +137,11 @@ class Command
 		@exec = lamb
 		@args = args
 		@name = name
+		@stack = Stack.S
 		@numberOfConsequences = 0
+	end
+	def setStack(stack)
+		@stack = stack	
 	end
 	def isanum #some commands are actually numbers, they have no arguments
 			#but have a single consequence(The number pushed to the stack)
@@ -150,16 +150,16 @@ class Command
 	def do#execute the command
 		topush = @exec.call(@args)
 		for item in topush
-			Stack.S.push(CommandBuilder.round(item))
+			@stack.push(CommandBuilder.round(item))
 			@numberOfConsequences += 1
 		end
 	end
 	def undo#undo the command
 		for x in 0...@numberOfConsequences
-			Stack.S.pop#Take the number of things off the stack that we put on
+			@stack.pop#Take the number of things off the stack that we put on
 		end
 		for y in @args.reverse#put the things we took off the stack back on
-			Stack.S.push(CommandBuilder.round(y))
+			@stack.push(CommandBuilder.round(y))
 		end
 	end
 	def to_s
@@ -176,6 +176,30 @@ class Command
 	end
 	def to_f
 		return @name.to_f
+	end
+end
+class StateMachine
+	def initialize
+		@state = NormalState.new()
+	end
+	def changeState
+		@state = NormalState.next()
+	end
+end
+class NormalState
+	def next
+		return MacroState.new
+	end
+	def state
+		return :normalState
+	end
+end
+class MacroState
+	def next
+		return NormalState.new
+	end
+	def state
+		return :macroState
 	end
 end
 end
