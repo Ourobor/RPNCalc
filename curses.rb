@@ -39,6 +39,9 @@ class Screen
 			write(row,cols/3,"|")
 			write(row,cols/3*2,"|")
 		end
+		for col in cols/3*2+1..cols
+			write(((stackStart-1)/2),col,"-")	
+		end
 		
 		#draw stacks on screen
 		itter = Stack.S.itter
@@ -63,8 +66,13 @@ class Screen
 			line -= 1
 			itter.next
 		end
-		line = stackStart -1
+		line = (stackStart -1)/2 - 1
 		@commandBuilder.objtable.each do |key,value|
+			write(line,cols/3*2+1,key + " => " + value.to_s)
+			line -= 1
+		end
+		line = (stackStart -1)
+		@commandBuilder.macroTable.getTable.each do |key,value|
 			write(line,cols/3*2+1,key + " => " + value.to_s)
 			line -= 1
 		end
