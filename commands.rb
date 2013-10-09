@@ -1,6 +1,5 @@
 module Commands
 require './stack'
-require './macro'
 class CommandBuilder
 	@@r = 6
 	@rules = nil
@@ -12,7 +11,6 @@ class CommandBuilder
 		@objtable = Hash.new
 		@@r = 6
 		@state = StateMachine.new
-		@macroTable = MacroSystem::MacroTable.new
 		addRule("+", lambda {|a| return [a[1].to_f + a[0].to_f] }, 2)
 		addRule("q", Proc.new { exit }, 0)
 		addRule("-", lambda {|a| return [a[1].to_f - a[0].to_f] }, 2)
@@ -61,77 +59,43 @@ class CommandBuilder
 	def self.round(num)
 		return num.to_f.round(@@r)
 	end
-	def macroTable
-		return @macroTable
-	end
 	def parse(string)
 		sections = string.split(" ")
 		i = 0
 		nopush = false
 		begin
 		itter = (0...sections.length).to_enum
-		name = ""
 		while true
  			i = itter.next
-			part = sections[i]
-			if @state.state == :normalState
-				if(part == "{")
-					@state.next
-					name = sections[itter.next]
-					if(name == "}")
-						@state.next
-						raise("Macros require names!")
-					else
-						@macroTable.addMacro(name)
-					end
-				elsif(@rules.has_key?(part))
-					#parse thing
-					cmd = buildCommand(part)
-					Stack.U.push(cmd)
-					cmd.do
-				elsif(is_a_number?(part))
-					#push
-					num = Command.new(lambda { }, CommandBuilder.round(part))
-					num.isanum
-					Stack.U.push(num)
-					Stack.S.push(CommandBuilder.round(part))
-				elsif(part == ">>")
-					var = sections[itter.next]
-					if @rules.has_key?(var)
-						raise("Can't name a variable the same name as a rule!")
-					end
-					@objtable[var] = Stack.S.top
-				elsif(@objtable.has_key?(part))
-					num = Command.new(lambda { }, [], CommandBuilder.round(@objtable[part]))
-					num.isanum
-					Stack.U.push(num)
-					Stack.S.push(CommandBuilder.round(@objtable[part]))
-	
-				else
-					#bail
-					raise("Invalid command")
+			part = sections[i]	
+			if(@rules.has_key?(part))
+				#parse thing
+				cmd = buildCommand(part)
+				Stack.U.push(cmd)
+				cmd.do
+			elsif(is_a_number?(part))
+				#push
+				num = Command.new(lambda { }, [], CommandBuilder.round(part))
+				num.isanum
+				Stack.U.push(num)
+				Stack.S.push(CommandBuilder.round(part))
+			elsif(part == ">>")
+				var = sections[itter.next]
+				if @rules.has_key?(var)
+					raise("Can't name a variable the same name as a rule!")
 				end
-			elsif @state.state == :macroState
-				if(part == "}")
-					@state.next
-				elsif(@rules.has_key?(part))
-					#generate a command
-					command = Command.new(@rules[part],part)
-					#smash it into the macro
-					@macroTable.addToMacro(name, command)
-				elsif(is_a_number?(part))
-					#smash that number object into that macro
-					num = Command.new(lambda { }, CommandBuilder.round(part))
-					num.isanum
-					@macroTable.addToMacro(name,cmd)
-				else
-					#must be the name of a variable
-					#slap that crap into the macro
-					#EXPLOSIONS!
-				end
+				@objtable[var] = Stack.S.top
+			elsif(@objtable.has_key?(part))
+				num = Command.new(lambda { }, [], CommandBuilder.round(@objtable[part]))
+				num.isanum
+				Stack.U.push(num)
+				Stack.S.push(CommandBuilder.round(@objtable[part]))
+
+			else
+				#bail
+				raise("Invalid command")
 			end
 		end
-
 		rescue StopIteration
 			#iterators only throw an exception when they're done
 		rescue RuntimeError => e#this bit handles an exceptions that parse
@@ -156,8 +120,7 @@ class CommandBuilder
 		for x in 0...@args[command]
 			args << Stack.S.pop
 		end
-		command = Command.new(@rules[command],command)
-		command.populate(args)	
+		command = Command.new(@rules[command],args,command)	
 		return command
 	end
 end
@@ -170,18 +133,15 @@ class Command
 			#see what the command's name is on the command stack
 	@numberOfConsequences = nil #The number of things the command pushed
 
-	def initialize(lamb,name)
+	def initialize(lamb,args,name)
 		@exec = lamb
-		@args = []
+		@args = args
 		@name = name
 		@stack = Stack.S
 		@numberOfConsequences = 0
 	end
 	def setStack(stack)
 		@stack = stack	
-	end
-	def populate(args)
-		@args = args
 	end
 	def isanum #some commands are actually numbers, they have no arguments
 			#but have a single consequence(The number pushed to the stack)
@@ -222,11 +182,8 @@ class StateMachine
 	def initialize
 		@state = NormalState.new()
 	end
-	def next
-		@state = @state.next()
-	end
-	def state
-		return @state.state
+	def changeState
+		@state = NormalState.next()
 	end
 end
 class NormalState
