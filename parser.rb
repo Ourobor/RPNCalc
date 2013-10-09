@@ -5,6 +5,10 @@ class Parser
 		@rules = Hash.new
 		@args = Hash.new
 		@cBuilder = CommandBuilder.new
+
+		@sections = nil 	#sections of the text the parser is parsing
+		@iter = nil		#the iterator the parser is using to itterate though the text
+
 		#------------This is outside the purpose of this class
 		@objtable = Hash.new
 		@@r = 6
@@ -89,55 +93,25 @@ class Parser
 	#^^^^^^^^^^
 
 	def parse(string)
-		sections = string.split(" ")
+		@sections = string.split(" ")
 		i = 0
 		nopush = false
 		begin
-		itter = (0...sections.length).to_enum
-
-
-		begin
+		@iter = (0...@sections.length).to_enum
 		while true
- 			i = itter.next
-			part = sections[i]	
-			if(@rules.has_key?(part))
-				#parse thing
-				cmd = @cBuilder.buildCommand(part,@rules[part],@args[part])
-				Stack.U.push(cmd)
-				cmd.do
-			elsif(is_a_number?(part))
-				#push
-				num = Command.new(lambda { }, [], Parser.round(part))
-				num.isanum
-				Stack.U.push(num)
-				Stack.S.push(Parser.round(part))
-			elsif(part == ">>")
-				var = sections[itter.next]
-				if @rules.has_key?(var)
-					raise("Can't name a variable the same name as a rule!")
-				end
-				@objtable[var] = Stack.S.top
-			elsif(@objtable.has_key?(part))
-				num = Command.new(lambda { }, [], Parser.round(@objtable[part]))
-				num.isanum
-				Stack.U.push(num)
-				Stack.S.push(Parser.round(@objtable[part]))
-
-			else
-				#bail
-				raise("Invalid command")
-			end
+ 			i = @iter.next
+			part = @sections[i]	
+			parseNormalMode(part)
 		end
 		rescue StopIteration
 			#iterators only throw an exception when they're done
-		end
-
-		rescue RuntimeError => e#this bit handles an exceptions that parse
+		rescue RuntimeError => e
+		#this bit handles an exceptions that parse
 		#raised and points an arrow at the term in the given string that
 		#caused the issue
 			x = 0
 			for y in 0...i+1
-				x += sections[y].length + 1
+				x += @sections[y].length + 1
 			end
 			message =  string + "\n"
 			(x - 2).times { message += " " } 
@@ -145,13 +119,32 @@ class Parser
 			raise message
 		end
 	end
+	def parseNormalMode(part)
+		if(@rules.has_key?(part))
+			cmd = @cBuilder.buildCommand(part,@rules[part],@args[part])
+			Stack.U.push(cmd)
+			cmd.do
+		elsif(is_a_number?(part))
+			num = Command.new(lambda { }, [], Parser.round(part))
+			num.isanum
+			Stack.U.push(num)
+			Stack.S.push(Parser.round(part))
+		elsif(part == ">>")
+			var = @sections[@iter.next]
+			if @rules.has_key?(var)
+				raise("Can't name a variable the same name as a rule!")
+			end
+			@objtable[var] = Stack.S.top
+		elsif(@objtable.has_key?(part))
+			num = Command.new(lambda { }, [], Parser.round(@objtable[part]))
+			num.isanum
+			Stack.U.push(num)
+			Stack.S.push(Parser.round(@objtable[part]))
+		else
+			raise("Invalid command")
+		end
+	end
 	def objtable
 		return @objtable
 	end
-end
-class NormalParser
-
-end
-class MacroParser
-
 end
