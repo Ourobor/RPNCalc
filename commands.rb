@@ -48,6 +48,8 @@ class CommandBuilder
 		#The third argument is how many arguments are needed for the lambda to work
 		#these are poped off of the stack
 	end
+		
+	#These shouldn't be in here. It is beyond the scope of what command builder is meant to do
 	def addRule(name,code,args)
 		@rules[name] = code
 		@args[name] = args
@@ -58,6 +60,7 @@ class CommandBuilder
 	def self.round(num)
 		return num.to_f.round(@@r)
 	end
+
 	def parse(string)
 		sections = string.split(" ")
 		i = 0
@@ -119,6 +122,8 @@ class CommandBuilder
 	def objtable
 		return @objtable
 	end
+	
+	#This is something that does belong
 	def buildCommand(command)		
 		args = []
 		for x in 0...@args[command]

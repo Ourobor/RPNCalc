@@ -2,10 +2,12 @@
 require 'curses'
 require './stack'
 require './commands'
+require './parser'
 class Screen
 	@commandBuilder = nil
 	def initialize()
 		@commandBuilder = Commands::CommandBuilder.new
+		@parser = Parser::Parser.new
 	end
 	def init_screen
 		Curses.noecho # do not show typed keys
@@ -72,7 +74,7 @@ class Screen
 		Curses.setpos(lines,0)
 	end
 	def parse(string)
-		@commandBuilder.parse(string)
+		@parser.parse(string)
 	end
 	def main()
 		init_screen do
