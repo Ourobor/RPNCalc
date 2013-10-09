@@ -6,8 +6,8 @@ require './parser'
 class Screen
 	@commandBuilder = nil
 	def initialize()
-		@commandBuilder = Commands::CommandBuilder.new
-		@parser = Parser::Parser.new
+		@commandBuilder = CommandBuilder.new
+		@parser = Parser.new
 	end
 	def init_screen
 		Curses.noecho # do not show typed keys
@@ -66,7 +66,7 @@ class Screen
 			itter.next
 		end
 		line = stackStart -1
-		@commandBuilder.objtable.each do |key,value|
+		@parser.objtable.each do |key,value|
 			write(line,cols/3*2+1,key + " => " + value.to_s)
 			line -= 1
 		end

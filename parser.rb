@@ -1,14 +1,13 @@
-module Parser
 require './commands'
 require './stack'
 class Parser
 	def initialize
 		@rules = Hash.new
 		@args = Hash.new
-		@cBuilder = Commands::CommandBuilder.new
+		@cBuilder = CommandBuilder.new
 		#------------This is outside the purpose of this class
 		@objtable = Hash.new
-		@r = 6
+		@@r = 6
 		#------------
 	addRule("+", \
 		lambda {|a| return [a[1].to_f + a[0].to_f] }, 2)
@@ -84,8 +83,8 @@ class Parser
 	end
 	
 	#vvvvvvvvvv Outside the scope of this class
-	def round(num)
-		return num.to_f.round(@r)
+	def self.round(num)
+		return num.to_f.round(@@r)
 	end
 	#^^^^^^^^^^
 
@@ -103,15 +102,15 @@ class Parser
 			part = sections[i]	
 			if(@rules.has_key?(part))
 				#parse thing
-				cmd = @cBuilder.buildCommand(part)
+				cmd = @cBuilder.buildCommand(part,@rules[part],@args[part])
 				Stack.U.push(cmd)
 				cmd.do
 			elsif(is_a_number?(part))
 				#push
-				num = Commands::Command.new(lambda { }, [], round(part))
+				num = Command.new(lambda { }, [], Parser.round(part))
 				num.isanum
 				Stack.U.push(num)
-				Stack.S.push(round(part))
+				Stack.S.push(Parser.round(part))
 			elsif(part == ">>")
 				var = sections[itter.next]
 				if @rules.has_key?(var)
@@ -119,10 +118,10 @@ class Parser
 				end
 				@objtable[var] = Stack.S.top
 			elsif(@objtable.has_key?(part))
-				num = Commands::Command.new(lambda { }, [], round(@objtable[part]))
+				num = Command.new(lambda { }, [], Parser.round(@objtable[part]))
 				num.isanum
 				Stack.U.push(num)
-				Stack.S.push(round(@objtable[part]))
+				Stack.S.push(Parser.round(@objtable[part]))
 
 			else
 				#bail
@@ -136,7 +135,6 @@ class Parser
 		rescue RuntimeError => e#this bit handles an exceptions that parse
 		#raised and points an arrow at the term in the given string that
 		#caused the issue
-			Stack.U.pop
 			x = 0
 			for y in 0...i+1
 				x += sections[y].length + 1
@@ -156,5 +154,4 @@ class NormalParser
 end
 class MacroParser
 
-end
 end
