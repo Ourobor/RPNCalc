@@ -1,13 +1,13 @@
-require './stack'
 class CommandBuilder
-	def initialize
+	def initialize(database)
+		@database = database
 	end
 	def buildCommand(command,lamb,numArgs)		
 		args = []
 		for x in 0...numArgs
-			args << Stack.S.pop
+			args << @database.getMain.pop
 		end
-		command = Command.new(lamb,args,command)	
+		command = Command.new(lamb,args,command,@database)	
 		return command
 	end
 end
@@ -19,11 +19,12 @@ class Command
 			#see what the command's name is on the command stack
 	@numberOfConsequences = nil #The number of things the command pushed
 
-	def initialize(lamb,args,name)
+	def initialize(lamb,args,name,database)
 		@exec = lamb
 		@args = args
 		@name = name
 		@numberOfConsequences = 0
+		@database = database
 	end
 	def isanum #some commands are actually numbers, they have no arguments
 			#but have a single consequence(The number pushed to the stack)
@@ -32,16 +33,16 @@ class Command
 	def do#execute the command
 		topush = @exec.call(@args)
 		for item in topush
-			Stack.S.push(Parser.round(item))##TODO
+			@database.getMain.push(@database.round(item))
 			@numberOfConsequences += 1
 		end
 	end
 	def undo#undo the command
 		for x in 0...@numberOfConsequences
-			Stack.S.pop#Take the number of things off the stack that we put on
+			@database.getMain.pop#Take the number of things off the stack that we put on
 		end
 		for y in @args.reverse#put the things we took off the stack back on
-			Stack.S.push(Parser.round(y))##TODO
+			@database.getMain.push(@database.round(y))
 		end
 	end
 	def to_s

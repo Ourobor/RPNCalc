@@ -1,13 +1,13 @@
 #!/usr/bin/env ruby
 require 'curses'
-require './stack'
+require './database'
 require './commands'
 require './parser'
 class Screen
 	@commandBuilder = nil
 	def initialize()
-		@commandBuilder = CommandBuilder.new
-		@parser = Parser.new
+		@database = Database.new
+		@parser = Parser.new(@database)
 	end
 	def init_screen
 		Curses.noecho # do not show typed keys
@@ -43,7 +43,7 @@ class Screen
 		end
 		
 		#draw stacks on screen
-		itter = Stack.S.itter
+		itter = @database.getMain.itter
 		line = stackStart - 1
 		while itter.done? == false
 			write(line,0,itter.value.to_s)
@@ -51,7 +51,7 @@ class Screen
 			itter.next
 		end
 		line = stackStart - 1
-		itter = Stack.U.itter
+		itter = @database.getCommand.itter
 		while itter.done? == false
 			if(line == 0)
 				#it seems perfectly likely that the undo stack
@@ -66,7 +66,7 @@ class Screen
 			itter.next
 		end
 		line = stackStart -1
-		@parser.objtable.each do |key,value|
+		@database.objtable.each do |key,value|
 			write(line,cols/3*2+1,key + " => " + value.to_s)
 			line -= 1
 		end

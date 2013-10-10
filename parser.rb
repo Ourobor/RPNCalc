@@ -1,18 +1,14 @@
 require './commands'
-require './stack'
 class Parser
-	def initialize
+	def initialize(database)
+		@database = database
 		@rules = Hash.new
 		@args = Hash.new
-		@cBuilder = CommandBuilder.new
+		@cBuilder = CommandBuilder.new(database)
 
 		@sections = nil 	#sections of the text the parser is parsing
 		@iter = nil		#the iterator the parser is using to itterate though the text
 
-		#------------This is outside the purpose of this class
-		@objtable = Hash.new
-		@@r = 6
-		#------------
 	addRule("+", \
 		lambda {|a| return [a[1].to_f + a[0].to_f] }, 2)
 	addRule("q", \
@@ -32,7 +28,7 @@ class Parser
 	addRule("c", \
 		lambda {|a| return []}, 1)
 	addRule("cc", \
-		lambda {|a| Stack.S.clear;return []}, 0)
+		lambda {|a| @database.getMain.clear;return []}, 0)
 	addRule("sqrt", \
 		lambda {|a| return [Math.sqrt(a[0].to_f)]}, 1)
 	addRule("sin", \
@@ -60,13 +56,13 @@ class Parser
 	addRule("acosd", \
 		lambda {|a| return [(Math.acos(a[0].to_f) * 180) / Math::PI]}, 1)
 	addRule("r", \
-		lambda {|a| @@r = a[0].to_f; return []}, 1)
+		lambda {|a| @database.setRound(a[0].to_f); return []}, 1)
 	addRule("ckck", \
-		lambda {|a| Stack.S.clear; Stack.U.clear; return [] }, 0)
+		lambda {|a| @database.getMain.clear; @database.getCommand.clear; return [] }, 0)
 	addRule("u", \
-		lambda {|a| Stack.U.pop; Stack.U.pop.undo; return []}, 0)
+		lambda {|a| @database.getCommand.pop; @database.getCommand.pop.undo; return []}, 0)
 	addRule("clrt", \
-		lambda {|a| Stack.U.pop; @objtable = Hash.new}, 0)
+		lambda {|a| @database.getCommand.pop; @database.emptyObjtable}, 0)
 	#If you read this code and want to add more rules to it or
 	#something, it's fairly straightforward
 	#addRule adds a rule to be parsed
@@ -78,6 +74,8 @@ class Parser
 	#The third argument is how many arguments are needed for the lambda to work
 	#these are poped off of the stack
 	end
+
+
 	def addRule(name,code,args)
 		@rules[name] = code
 		@args[name] = args
@@ -85,12 +83,6 @@ class Parser
 	def is_a_number?(s)
 		s.to_s.match(/\A[+-]?\d+?(\.\d+)?\Z/) == nil ? false : true
 	end
-	
-	#vvvvvvvvvv Outside the scope of this class
-	def self.round(num)
-		return num.to_f.round(@@r)
-	end
-	#^^^^^^^^^^
 
 	def parse(string)
 		@sections = string.split(" ")
@@ -122,29 +114,26 @@ class Parser
 	def parseNormalMode(part)
 		if(@rules.has_key?(part))
 			cmd = @cBuilder.buildCommand(part,@rules[part],@args[part])
-			Stack.U.push(cmd)
+			@database.getCommand.push(cmd)
 			cmd.do
 		elsif(is_a_number?(part))
-			num = Command.new(lambda { }, [], Parser.round(part))
+			num = Command.new(lambda { }, [], @database.round(part),@database)
 			num.isanum
-			Stack.U.push(num)
-			Stack.S.push(Parser.round(part))
+			@database.getCommand.push(num)
+			@database.getMain.push(@database.round(part))
 		elsif(part == ">>")
 			var = @sections[@iter.next]
 			if @rules.has_key?(var)
 				raise("Can't name a variable the same name as a rule!")
 			end
-			@objtable[var] = Stack.S.top
-		elsif(@objtable.has_key?(part))
-			num = Command.new(lambda { }, [], Parser.round(@objtable[part]))
+			@database.setVariable(var, @database.getMain.top)
+		elsif(@database.isVariable(part))
+			num = Command.new(lambda { }, [], @database.round(@database.getVariable(part)),@database)
 			num.isanum
-			Stack.U.push(num)
-			Stack.S.push(Parser.round(@objtable[part]))
+			@database.getCommand.push(num)
+			@database.getMain.push(@database.round(@database.getVariable(part)))
 		else
 			raise("Invalid command")
 		end
-	end
-	def objtable
-		return @objtable
 	end
 end

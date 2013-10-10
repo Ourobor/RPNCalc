@@ -1,15 +1,4 @@
 class Stack
-	@@S = Stack.new
-	@@U = Stack.new
-
-        def self.S()
-		return @@S
-	end
-	def self.U()
-		return @@U
-	end
-
-
 	@head = nil
 
         def initialize
