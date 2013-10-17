@@ -53,9 +53,12 @@ Examples:
 	ex: `12 13` >> [13, 12] etc
 	
 	ex Take the sine of a 90° angle
-	`90 sind` >> []
+	`90 sind` >> [1]
 
 	ex Store a variable on the stack
 	`12 >> var` >> [12]
 	`var` >> [12, 12]
 	`+` >> [24]	
+
+Future:
+	Macros: chunks of RPN that reference variables and can be executed later when desired
