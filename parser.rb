@@ -117,10 +117,10 @@ class Parser
 			@database.getCommand.push(cmd)
 			cmd.do
 		elsif(is_a_number?(part))
-			num = Command.new(lambda { }, [], @database.round(part),@database)
+			num = Command.new(lambda {|a| return [@database.round(part)] }, [], @database.round(part),@database)
 			num.isanum
 			@database.getCommand.push(num)
-			@database.getMain.push(@database.round(part))
+			num.do
 		elsif(part == ">>")
 			var = @sections[@iter.next]
 			if @rules.has_key?(var)
@@ -128,10 +128,10 @@ class Parser
 			end
 			@database.setVariable(var, @database.getMain.top)
 		elsif(@database.isVariable(part))
-			num = Command.new(lambda { }, [], @database.round(@database.getVariable(part)),@database)
+			num = Command.new(lambda {|a| return [@database.round(@database.getVariable(part))] }, [], @database.round(@database.getVariable(part)),@database)
 			num.isanum
 			@database.getCommand.push(num)
-			@database.getMain.push(@database.round(@database.getVariable(part)))
+			num.do
 		else
 			raise("Invalid command")
 		end
