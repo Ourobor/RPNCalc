@@ -117,7 +117,9 @@ class Parser
 			@database.getCommand.push(cmd)
 			cmd.do
 		elsif(is_a_number?(part))
+			
 			num = Command.new(lambda {|a| return [@database.round(part)] }, [], @database.round(part),@database)
+			
 			num.isanum
 			@database.getCommand.push(num)
 			num.do
@@ -128,7 +130,9 @@ class Parser
 			end
 			@database.setVariable(var, @database.getMain.top)
 		elsif(@database.isVariable(part))
+
 			num = Command.new(lambda {|a| return [@database.round(@database.getVariable(part))] }, [], @database.round(@database.getVariable(part)),@database)
+			
 			num.isanum
 			@database.getCommand.push(num)
 			num.do
