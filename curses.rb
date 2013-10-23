@@ -9,6 +9,18 @@ class Screen
 		@database = Database.new
 		@parser = Parser.new(@database)
 	end
+	def getStr
+		outstr = ""
+		loop do
+			inchar = Curses.getch
+			if inchar == 10 || inchar == 459#Break on normal enter or numpad enter
+				break
+			else
+				outstr << inchar
+			end
+		end
+		return outstr
+	end
 	def init_screen
 		Curses.noecho # do not show typed keys
 		Curses.init_screen
@@ -82,7 +94,7 @@ class Screen
 			drawScreen
 			Curses.setpos((Curses.lines  * (3.0/4.0)).to_i + 1, 0)	
 			Curses.echo
-                        string = Curses.getstr()
+            string = getStr()
 			Curses.noecho
 			Curses.clear
 			begin
